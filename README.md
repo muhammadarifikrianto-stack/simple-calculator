@@ -19,5 +19,4 @@ A simple, responsive web-based calculator featuring a clean, high-contrast neo-b
 
 To run this project locally, you don't need any special build tools or local servers.
 
-1. Clone the repository:
-   ```bash https://muhammadarifikrianto-stack.github.io/simpel-calculator/
+git clone git@github.com:muhammadarifikrianto-stack/simpel-calculator.git
