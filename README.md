@@ -2,10 +2,6 @@
 
 A simple, responsive web-based calculator featuring a clean, high-contrast neo-brutalist design aesthetic. 
 
-## 📸 Preview
-
-![Calculator Preview](Screenshot_2026-07-24-20-01-42-906_com.android.chrome.jpg)
-
 ## ✨ Features
 
 *   **Core Arithmetic:** Supports basic math operations (addition, subtraction, multiplication, division).
