@@ -21,4 +21,4 @@ To run this project locally, you don't need any special build tools or local ser
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+   git clone [https://github.com/your-username/your-repo-name.git](https://muhammadarifikrianto-stack.github.io/simpel-calculator/)
