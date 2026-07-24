@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Monokrom</title>
+    <style>
+        /* Pengaturan Variabel Warna Monokrom */
+        :root {
+            --bg-body: #d1d5db; /* Abu-abu terang untuk latar belakang luar */
+            --bg-calc: #ffffff;
+            --color-black: #000000;
+            --color-white: #ffffff;
+            --border-width: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Wadah Utama Kalkulator */
+        .calculator {
+            width: 100%;
+            max-width: 360px;
+            background-color: var(--bg-calc);
+            border: var(--border-width) solid var(--color-black);
+            box-shadow: 12px 12px 0px var(--color-black);
+            padding: 24px;
+            border-radius: 8px;
+        }
+
+        /* Layar Tampilan Kalkulator */
+        .display-container {
+            margin-bottom: 24px;
+        }
+
+        .display {
+            width: 100%;
+            background-color: var(--color-white);
+            color: var(--color-black);
+            border: var(--border-width) solid var(--color-black);
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-align: right;
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        /* Kustomisasi Scrollbar untuk layar jika angka terlalu panjang */
+        .display::-webkit-scrollbar {
+            height: 6px;
+        }
+        .display::-webkit-scrollbar-thumb {
+            background: var(--color-black);
+            border-radius: 4px;
+        }
+
+        /* Susunan Tombol (Grid) */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Desain Dasar Tombol */
+        button {
+            font-size: 1.75rem;
+            font-weight: 800;
+            padding: 16px 0;
+            background-color: var(--color-white);
+            color: var(--color-black);
+            border: var(--border-width) solid var(--color-black);
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--color-black);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Efek saat tombol ditekan */
+        button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px var(--color-black);
+        }
+
+        /* Tombol Spesial (Operator & Sama Dengan) */
+        .btn-operator {
+            background-color: var(--color-black);
+            color: var(--color-white);
+        }
+
+        .btn-clear {
+            background-color: #e5e7eb; /* Abu-abu pucat agar sedikit beda tapi tetap monokrom */
+        }
+
+        .btn-equals {
+            background-color: var(--color-black);
+            color: var(--color-white);
+            grid-row: span 2; /* Mengambil 2 baris agar mudah ditekan */
+        }
+
+        .btn-zero {
+            grid-column: span 2; /* Mengambil 2 kolom */
+        }
+
+        /* Responsivitas untuk layar HP yang sangat kecil */
+        @media (max-width: 400px) {
+            .calculator {
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+                box-shadow: 0px 12px 0px var(--color-black); /* Hanya bayangan bawah */
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="display-container">
+            <div class="display" id="display">0</div>
+        </div>
+        
+        <div class="keypad">
+            <!-- Baris 1 -->
+            <button class="btn-clear" onclick="bersihkanLayar()" title="Clear (Escape)">C</button>
+            <button class="btn-operator" onclick="tambahOperator('/')" title="Bagi (/)">÷</button>
+            <button class="btn-operator" onclick="tambahOperator('*')" title="Kali (*)">×</button>
+            <button class="btn-clear" onclick="hapusSatu()" title="Hapus (Backspace)">⌫</button>
+
+            <!-- Baris 2 -->
+            <button onclick="tambahAngka('7')">7</button>
+            <button onclick="tambahAngka('8')">8</button>
+            <button onclick="tambahAngka('9')">9</button>
+            <button class="btn-operator" onclick="tambahOperator('-')" title="Kurang (-)">-</button>
+
+            <!-- Baris 3 -->
+            <button onclick="tambahAngka('4')">4</button>
+            <button onclick="tambahAngka('5')">5</button>
+            <button onclick="tambahAngka('6')">6</button>
+            <button class="btn-operator" onclick="tambahOperator('+')" title="Tambah (+)">+</button>
+
+            <!-- Baris 4 -->
+            <button onclick="tambahAngka('1')">1</button>
+            <button onclick="tambahAngka('2')">2</button>
+            <button onclick="tambahAngka('3')">3</button>
+            <button class="btn-equals" onclick="hitungHasil()" title="Sama Dengan (Enter)">=</button>
+
+            <!-- Baris 5 -->
+            <button class="btn-zero" onclick="tambahAngka('0')">0</button>
+            <button onclick="tambahAngka('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        const elemenLayar = document.getElementById('display');
+        
+        let angkaSaatIni = '0';
+        let angkaSebelumnya = '';
+        let operatorAktif = undefined;
+        let harusResetLayar = false;
+        let adaError = false;
+
+        // Memperbarui teks yang ada di layar kalkulator
+        function perbaruiLayar() {
+            elemenLayar.innerText = angkaSaatIni;
+            // Scroll otomatis ke kanan jika digitnya panjang
+            elemenLayar.scrollLeft = elemenLayar.scrollWidth;
+        }
+
+        // Reset semua kondisi
+        function bersihkanLayar() {
+            angkaSaatIni = '0';
+            angkaSebelumnya = '';
+            operatorAktif = undefined;
+            adaError = false;
+            perbaruiLayar();
+        }
+
+        // Hapus digit terakhir
+        function hapusSatu() {
+            if (adaError) return bersihkanLayar();
+            if (harusResetLayar) return;
+            
+            if (angkaSaatIni.length === 1 || (angkaSaatIni.length === 2 && angkaSaatIni.startsWith('-'))) {
+                angkaSaatIni = '0';
+            } else {
+                angkaSaatIni = angkaSaatIni.slice(0, -1);
+            }
+            perbaruiLayar();
+        }
+
+        // Menambahkan input angka ke layar
+        function tambahAngka(angka) {
+            if (adaError) bersihkanLayar();
+
+            if (angkaSaatIni === '0' && angka !== '.' || harusResetLayar) {
+                angkaSaatIni = angka;
+                harusResetLayar = false;
+            } else {
+                // Cegah penulisan titik desimal lebih dari satu kali
+                if (angka === '.' && angkaSaatIni.includes('.')) return;
+                angkaSaatIni += angka;
+            }
+            perbaruiLayar();
+        }
+
+        // Memilih operator matematika
+        function tambahOperator(operator) {
+            if (adaError) return;
+            if (operatorAktif !== undefined && !harusResetLayar) {
+                hitungHasil();
+            }
+            angkaSebelumnya = angkaSaatIni;
+            operatorAktif = operator;
+            harusResetLayar = true;
+        }
+
+        // Kalkulasi matematika
+        function hitungHasil() {
+            if (operatorAktif === undefined || harusResetLayar || adaError) return;
+            
+            let hasil;
+            const angka1 = parseFloat(angkaSebelumnya);
+            const angka2 = parseFloat(angkaSaatIni);
+            
+            if (isNaN(angka1) || isNaN(angka2)) return;
+
+            switch (operatorAktif) {
+                case '+':
+                    hasil = angka1 + angka2;
+                    break;
+                case '-':
+                    hasil = angka1 - angka2;
+                    break;
+                case '*':
+                    hasil = angka1 * angka2;
+                    break;
+                case '/':
+                    if (angka2 === 0) {
+                        tampilkanError("Error");
+                        return;
+                    }
+                    hasil = angka1 / angka2;
+                    break;
+                default:
+                    return;
+            }
+
+            // Membulatkan hasil untuk menghindari bug desimal JS (misal 0.1 + 0.2)
+            angkaSaatIni = Math.round(hasil * 1000000000) / 1000000000;
+            operatorAktif = undefined;
+            angkaSebelumnya = '';
+            harusResetLayar = true;
+            perbaruiLayar();
+        }
+
+        // Tampilan khusus jika terjadi perhitungan mustahil (misal bagi 0)
+        function tampilkanError(pesan) {
+            angkaSaatIni = pesan;
+            adaError = true;
+            perbaruiLayar();
+        }
+
+        // -- DUKUNGAN KEYBOARD --
+        // Memungkinkan kalkulator digunakan via keyboard PC/Laptop dengan cepat
+        window.addEventListener('keydown', function(e) {
+            if (e.key >= 0 && e.key <= 9) {
+                tambahAngka(e.key);
+            }
+            if (e.key === '.' || e.key === ',') {
+                tambahAngka('.');
+            }
+            if (e.key === '=' || e.key === 'Enter') {
+                e.preventDefault(); // Cegah enter dari aktivasi tombol difokuskan
+                hitungHasil();
+            }
+            if (e.key === 'Backspace') {
+                hapusSatu();
+            }
+            if (e.key === 'Escape' || e.key === 'Delete') {
+                bersihkanLayar();
+            }
+            if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+                tambahOperator(e.key);
+            }
+        });
+    </script>
+</body>
+</html>
