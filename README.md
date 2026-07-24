@@ -19,4 +19,4 @@ A simple, responsive web-based calculator featuring a clean, high-contrast neo-b
 
 To run this project locally, you don't need any special build tools or local servers.
 
-https://muhammadarifikrianto-stack.github.io/simpel-calculator/
+https://muhammadarifikrianto-stack.github.io/simple-calculator/
